@@ -63,15 +63,16 @@ def generate(inputFileList,dataAccessor,batchSize=100,nFiles=2):
                 #print '  batch size ',currentBatchSize
                 chosenFileIndex = random.randint(0,len(openFiles)-1)
                 f = openFiles[chosenFileIndex]
-                nread = min([f['size']-f['index'],int(1.*batchSize/nFiles),batchSize-currentBatchSize])
+                nread = min([f['size']-f['index'],max(1,int(1.*batchSize/nFiles)),batchSize-currentBatchSize])
                 
                 #print '  reading ',f['path'],f['index'],f['index']+nread,f['size']
                 
                 dataAccessor.readFile(batch,f['handle'],f['index'],f['index']+nread)
                 f['index']+=nread
-                if f['index']>=f['size']:
+                if (f['index']+1)>=f['size']:
                     elem = openFiles.pop(chosenFileIndex)
                     #print 'dequeue ',elem,len(openFiles)
                 
             dataAccessor.concatenateBatch(batch)
             yield batch
+            
